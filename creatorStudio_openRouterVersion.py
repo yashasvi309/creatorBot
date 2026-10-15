@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import requests
@@ -254,66 +255,35 @@ def agent_youtube_seo_copywriting(topic: str, raw_notes: str) -> str:
 # 3. CENTRAL PIPELINE ORCHESTRATOR
 # =====================================================================
 def run_pipeline(topic: str, notes: str, image_dir: str) -> Dict[str, Any]:
-    """
-    Orchestrates the 3-agent Open-Source Creator Studio workflow via OpenRouter
-    and prints progress and structured outputs to the console.
-    """
     print("=" * 72)
     print("🚀 OPEN-SOURCE CREATOR STUDIO PIPELINE (OPENROUTER EDITION)")
-    print(f"🤖 Model Engine : {MODEL_NAME}")
-    print(f"🌐 Endpoint     : {OPENROUTER_API_URL}")
-    print(f"📌 Topic        : {topic}")
-    print(f"📁 Assets Dir   : {image_dir}")
     print("=" * 72)
 
-    # Verify API key configuration upfront
-    print("\n[*] Validating environment configuration (.env)...")
     if not validate_environment():
-        print(
-            "❌ [CRITICAL] OPENROUTER_API_KEY is missing or set to the default placeholder.\n"
-            "   To run this pipeline:\n"
-            "   1. Create a `.env` file in the project root.\n"
-            "   2. Set `OPENROUTER_API_KEY=\"sk-or-v1-...\"` with a valid key from [https://openrouter.ai/keys](https://openrouter.ai/keys)"
-        )
         sys.exit(1)
-
-    print("✅ Environment validated. Starting multi-agent orchestration...\n")
 
     pipeline_results: Dict[str, Any] = {}
 
     # --- Step 1: Social Media Captions Agent ---
-    print("-" * 72)
     print("▶️ [Agent 1/3] Running Social Media Captions Agent...")
-    print("-" * 72)
-    social_output = agent_social_media_captions(topic, notes)
-    pipeline_results["social_captions"] = social_output
-    print(social_output)
-    print()
+    pipeline_results["social_captions"] = agent_social_media_captions(topic, notes)
+    
+    print("⏳ Pausing for 3 seconds to prevent API rate limits...")
+    time.sleep(3) # <-- ADD DELAY HERE
 
     # --- Step 2: Visual Selection & Thumbnail Strategy Agent ---
-    print("-" * 72)
     print("▶️ [Agent 2/3] Running Visual Selection & Thumbnail Strategy Agent...")
-    print("-" * 72)
-    thumbnail_output = agent_visual_thumbnail_strategy(topic, image_dir)
-    pipeline_results["thumbnail_strategy"] = thumbnail_output
-    print(json.dumps(thumbnail_output, indent=2))
-    print()
+    pipeline_results["thumbnail_strategy"] = agent_visual_thumbnail_strategy(topic, image_dir)
+    
+    print("⏳ Pausing for 3 seconds to prevent API rate limits...")
+    time.sleep(3) # <-- ADD DELAY HERE
 
     # --- Step 3: YouTube SEO & Copywriting Agent ---
-    print("-" * 72)
     print("▶️ [Agent 3/3] Running YouTube SEO & Copywriting Agent...")
-    print("-" * 72)
-    seo_output = agent_youtube_seo_copywriting(topic, notes)
-    pipeline_results["youtube_seo"] = seo_output
-    print(seo_output)
-    print()
+    pipeline_results["youtube_seo"] = agent_youtube_seo_copywriting(topic, notes)
 
-    print("=" * 72)
     print("🎉 PIPELINE EXECUTION COMPLETE!")
-    print("=" * 72)
-
     return pipeline_results
-
 
 # =====================================================================
 # DUMMY ENVIRONMENT SETUP & ENTRY POINT

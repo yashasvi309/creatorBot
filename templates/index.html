@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Creator Studio</title>
+    <!-- Import Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+    <div class="max-w-4xl mx-auto py-10 px-6">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                Open-Source Creator Studio
+            </h1>
+            <p class="text-gray-400 mt-2">Generate Social Captions, Thumbnails, and YouTube SEO in one click.</p>
+        </div>
+
+        <!-- Input Form -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+            <form id="generateForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Video Topic</label>
+                    <input type="text" id="topic" required placeholder="e.g., Building an AI Agent System" 
+                        class="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Raw Notes</label>
+                    <textarea id="notes" required rows="4" placeholder="Dump your unedited thoughts or bullet points here..." 
+                        class="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+                <button type="submit" id="submitBtn" 
+                    class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200">
+                    Generate Content 🚀
+                </button>
+            </form>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="hidden text-center mt-8">
+            <div class="animate-pulse flex flex-col items-center">
+                <div class="h-8 w-8 bg-blue-500 rounded-full mb-4"></div>
+                <p class="text-blue-400 font-medium">Agents are working... this takes about 10-15 seconds.</p>
+            </div>
+        </div>
+
+        <!-- Results Display -->
+        <div id="results" class="hidden mt-8 space-y-6">
+            
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <h2 class="text-xl font-bold text-blue-400 mb-4">📱 Social Media Captions</h2>
+                <pre id="socialOutput" class="whitespace-pre-wrap text-sm text-gray-300 font-sans"></pre>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <h2 class="text-xl font-bold text-purple-400 mb-4">🎨 Thumbnail Strategy</h2>
+                <pre id="thumbnailOutput" class="whitespace-pre-wrap text-sm text-gray-300 bg-gray-900 p-4 rounded-lg"></pre>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <h2 class="text-xl font-bold text-red-400 mb-4">▶️ YouTube SEO & Copy</h2>
+                <pre id="seoOutput" class="whitespace-pre-wrap text-sm text-gray-300 font-sans"></pre>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript to Handle the API Call -->
+    <script>
+        document.getElementById('generateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // UI State updates
+            const btn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            results.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            const topic = document.getElementById('topic').value;
+            const notes = document.getElementById('notes').value;
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic, notes, image_dir: "./creator_assets" })
+                });
+
+                const json = await response.json();
+                
+                if (json.status === "success") {
+                    const data = json.data;
+                    document.getElementById('socialOutput').textContent = data.social_captions;
+                    document.getElementById('thumbnailOutput').textContent = JSON.stringify(data.thumbnail_strategy, null, 2);
+                    document.getElementById('seoOutput').textContent = data.youtube_seo;
+                    
+                    loading.classList.add('hidden');
+                    results.classList.remove('hidden');
+                } else {
+                    alert("Error generating content.");
+                }
+            } catch (err) {
+                alert("Network error occurred.");
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                loading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
