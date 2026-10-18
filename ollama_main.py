@@ -5,7 +5,7 @@ import uvicorn
 
 # Import your local Ollama + Gemma 4 script
 # (Make sure your Ollama pipeline file is named `creator_studio_ollama.py`)
-import creator_studio_ollama as studio
+import CreatorStudio as studio
 
 app = FastAPI(title="Open-Source Creator Studio (Local Ollama + Gemma 4)")
 
@@ -80,4 +80,4 @@ def generate_studio_content(request: GenerationRequest):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("ollama_main:app", host="0.0.0.0", port=8000, reload=True)
